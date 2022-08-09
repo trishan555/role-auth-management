@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require('express')
+const userRouter = require('./routes/userRouter')
 
 //express app
 const app = express()
@@ -12,11 +13,19 @@ const app = express()
  */
 
 //middleware
+app.use(cors())
 app.use(express.json())
 
 //routes
+app.use('/users', userRouter)
+//app.get('/', (req, res) => res.send('Hello'))
 
-app.get('/', (req, res) => res.send('Hello'))
+// Connect to MongoDB
+const URI = process.env.MONGODB_URL
+mongoose.connect(URI, (err) => {
+    if (err) throw err
+    console.log('Connected to MongoDB')
+})
 
 //port defining
 const port = process.env.PORT
