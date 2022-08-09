@@ -92,4 +92,4 @@ const userController = {
     },
 }
 
-module.exports = userCtrl
+module.exports = userController
