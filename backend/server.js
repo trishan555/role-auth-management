@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const userRouter = require('./routes/userRouter')
+const noteRouter = require('./routes/noteRouter')
 
 //express app
 const app = express()
@@ -20,6 +21,7 @@ app.use(express.json())
 
 //routes
 app.use('/users', userRouter)
+app.use('/api/notes', noteRouter)
 //app.get('/', (req, res) => res.send('Hello'))
 
 // Connect to MongoDB

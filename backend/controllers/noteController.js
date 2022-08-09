@@ -15,8 +15,7 @@ const noteController = {
             const newNote = new Note({
                 title,
                 content,
-                user_id: req.user.id,
-                name: req.user.name,
+                user_id: req.users._id,
             })
             await newNote.save()
             res.json({ msg: 'Created a Note' })
