@@ -1,14 +1,29 @@
 const router = require('express').Router()
-const userController = require('../controllers/userController')
+const {
+    login,
+    createUser,
+    getAllUser,
+    userUpdate,
+    logout,
+    userSearch,
+} = require('../Controllers/userController')
 
-// Register User
-router.post('/register', userController.registerUser)
-// Login User
-router.post('/login', userController.loginUser)
-//get users
-router.get('/allusers', userController.getUsers)
+//get all users with backend pagination
+router.get('/allusers/', getAllUser)
 
-// verify Token
-router.get('/verify', userController.verifiedToken)
+//search a user by eamil
+router.get('/usersearch/:item', userSearch)
+
+//user registraion
+router.post('/userReg/:id', userUpdate)
+
+//user logout
+router.get('/logout', logout)
+
+//user login
+router.post('/login', login)
+
+//create new user
+router.post('/createuser', createUser)
 
 module.exports = router

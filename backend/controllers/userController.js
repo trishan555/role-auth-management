@@ -1,95 +1,209 @@
-const User = require('../models/userModel')
-const bcrypt = require('bcrypt')
+const UserModel = require('../Models/UserModel')
 const jwt = require('jsonwebtoken')
+const maxAge = process.env.JWT_AGE
 
-const userController = {
-    registerUser: async (req, res) => {
-        try {
-            const {
-                firstName,
-                lastName,
-                email,
-                dateOfBirth,
-                mobile,
-                status,
-                password,
-                accountType,
-            } = req.body
-            const user = await User.findOne({ email: email })
-            if (user)
-                return res
-                    .status(400)
-                    .json({ msg: 'The email already exists.' })
-
-            const passwordHash = await bcrypt.hash(password, 10)
-            const newUser = new User({
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                dateOfBirth: dateOfBirth,
-                mobile: mobile,
-                status: status,
-                password: passwordHash,
-                accountType: accountType,
-            })
-            await newUser.save()
-            res.json({ msg: 'Sign up Success' })
-        } catch (err) {
-            return res.status(500).json({ msg: err.message })
+// JWT token creation function
+const createToken = (id, accountType, email, stat) => {
+    return jwt.sign(
+        { id, accountType, email, stat },
+        process.env.TOKEN_SECRET,
+        {
+            expiresIn: maxAge,
         }
-    },
-    loginUser: async (req, res) => {
-        try {
-            const { email, password } = req.body
-            const user = await User.findOne({ email: email })
-            if (!user)
-                return res.status(400).json({ msg: 'User does not exist.' })
-
-            const isMatch = await bcrypt.compare(password, user.password)
-            if (!isMatch)
-                return res.status(400).json({ msg: 'Incorrect password.' })
-
-            // if login success create token
-            const payload = { id: user._id, name: user.username }
-            const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-                expiresIn: '1d',
-            })
-
-            res.json({ token })
-        } catch (err) {
-            return res.status(500).json({ msg: err.message })
-        }
-    },
-    getUsers: async (req, res) => {
-        try {
-            const users = await User.find()
-            //console.log(req)
-            res.send(users)
-        } catch (err) {
-            return res.status(500).json({ msg: err.message })
-        }
-    },
-    verifiedToken: (req, res) => {
-        try {
-            const token = req.header('Authorization')
-            if (!token) return res.send(false)
-
-            jwt.verify(
-                token,
-                process.env.TOKEN_SECRET,
-                async (err, verified) => {
-                    if (err) return res.send(false)
-
-                    const user = await User.findById(verified.id)
-                    if (!user) return res.send(false)
-
-                    return res.send(true)
-                }
-            )
-        } catch (err) {
-            return res.status(500).json({ msg: err.message })
-        }
-    },
+    )
 }
 
-module.exports = userController
+//handling returned errors from db
+const handleErrors = (err) => {
+    let errors = { email: '', password: '' }
+
+    if (
+        err.message === 'Password is invalid' ||
+        err.message === 'Email is invalid'
+    ) {
+        errors.email = 'Email/Password is invalid'
+    }
+    if (err.code === 11000) {
+        errors.email = 'Email is already exist!'
+        return errors
+    }
+    if (err.message.includes('User validation failed')) {
+        Object.values(err.errors).forEach(({ properties }) => {
+            errors[properties.path] = properties.message
+        })
+    }
+    return errors
+}
+
+//generate random password for newly created user
+const passwordGen = () => {
+    const generator = require('generate-password')
+    const password = generator.generate({
+        length: 10,
+        numbers: true,
+        lowercase: true,
+    })
+    return password
+}
+
+//mail sender
+const sendmail = (email, password) => {
+    const nodemailer = require('nodemailer')
+    var transport = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    })
+    const mailOptions = {
+        from: '"Note Service" <note@surgeglobal.com>',
+        to: email,
+        subject: 'Note Service Login',
+        text: `Email: ${email} | password: ${password} | Login Link: http://localhost:3000/`,
+    }
+    transport.sendMail(mailOptions, function (err, info) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(info)
+        }
+    })
+}
+
+//user creation handling
+const createUser = async (req, res) => {
+    try {
+        const {
+            firstName,
+            lastName,
+            dateOfBirth,
+            phone,
+            accountType,
+            email,
+            password,
+        } = req.body
+        const user = await UserModel.create({
+            firstName,
+            lastName,
+            dateOfBirth,
+            phone,
+            accountType,
+            email,
+            password,
+        })
+        res.status(201).json({ user: user._id, created: true })
+        //sendmail(email, password)
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors, created: false })
+    }
+}
+
+//user login handling
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await UserModel.login(email, password)
+        const token = createToken(
+            user._id,
+            user.accountType,
+            user.email,
+            user.status
+        )
+        res.cookie('jwt', token, {
+            withCredentials: true,
+            httpOnly: false,
+            maxAge: maxAge * 1000,
+        })
+        res.status(200).json({ user: user._id, login: true })
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors, login: false })
+    }
+}
+
+//user fetching handling
+const getAllUser = async (req, res) => {
+    try {
+        // const { page } = req.params
+        // var newpage = page
+        // const size = process.env.USERS_PER_PAGE
+        // const totalRows = await UserModel.countDocuments()
+        // const totalPages = Math.ceil(totalRows / size)
+
+        // if (!totalPages) {
+        //     newpage = 1
+        // } else if (page > totalPages) {
+        //     newpage = totalPages
+        // }
+        // if (page < 1) {
+        //     newpage = 1
+        // }
+        // const skip = (newpage - 1) * size
+
+        const users = await UserModel.find({ accountType: 'student' })
+        // .select('-password')
+        // .sort({ _id: -1 })
+        // .skip(skip)
+        // .limit(size)
+        res.status(200).json({
+            users: users,
+        })
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors, created: false })
+    }
+}
+
+//user search handling
+const userSearch = async (req, res) => {
+    try {
+        const { item } = req.params
+        const users = await UserModel.find({
+            accountType: 'student',
+            email: new RegExp(item, 'i'),
+        }).select('-password')
+        res.status(200).json({ users: users })
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors, created: false })
+    }
+}
+
+//user registration   handling
+const userUpdate = async (req, res) => {
+    try {
+        const { id } = req.params
+        const userUpdated = await UserModel.findOneAndUpdate(
+            { _id: id },
+            req.body,
+            {
+                upsert: true,
+            }
+        )
+        res.status(200).json({ success: true, userUpdated })
+    } catch {
+        console.log(error)
+    }
+}
+
+//user logout handling
+const logout = async (req, res) => {
+    res.clearCookie('jwt')
+    res.redirect('http://localhost:3000/')
+}
+
+module.exports = {
+    logout,
+    userUpdate,
+    userSearch,
+    getAllUser,
+    login,
+    createUser,
+}
