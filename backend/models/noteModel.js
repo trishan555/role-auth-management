@@ -4,15 +4,15 @@ const noteSchema = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: true,
+            required: [true, 'Title is required'],
         },
-        content: {
+        description: {
             type: String,
-            required: true,
+            required: [true, 'Description is required'],
         },
-        user_id: {
+        userid: {
             type: String,
-            required: true,
+            required: [true, 'userid is required'],
         },
     },
     {
