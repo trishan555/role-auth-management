@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken')
 const maxAge = process.env.JWT_AGE
 
 // JWT token creation function
-const createToken = (id, accountType, email, stat) => {
+const createToken = (id, accountType, email, status) => {
     return jwt.sign(
-        { id, accountType, email, stat },
+        { id, accountType, email, status },
         process.env.TOKEN_SECRET,
         {
             expiresIn: maxAge,

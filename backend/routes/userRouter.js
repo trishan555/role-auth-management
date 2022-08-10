@@ -6,24 +6,26 @@ const {
     userUpdate,
     logout,
     userSearch,
-} = require('../Controllers/userController')
+} = require('../controllers/userController')
 
-//get all users with backend pagination
-router.get('/allusers/', getAllUser)
-
-//search a user by eamil
-router.get('/usersearch/:item', userSearch)
-
-//user registraion
-router.post('/userReg/:id', userUpdate)
-
-//user logout
-router.get('/logout', logout)
+const { isUser, isAdmin } = require('../middlewares/authMiddleware')
 
 //user login
 router.post('/login', login)
 
 //create new user
-router.post('/createuser', createUser)
+router.post('/createuser', isAdmin, createUser)
+
+//get all users
+router.get('/allusers/', isAdmin, getAllUser)
+
+//searching user by eamil
+router.get('/usersearch/:item', isAdmin, userSearch)
+
+//user update
+router.post('/userupdate/:id', isUser, userUpdate)
+
+//user logout
+router.get('/logout', logout)
 
 module.exports = router
