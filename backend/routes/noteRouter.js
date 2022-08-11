@@ -9,7 +9,7 @@ const {
 const { isStudent } = require('../middlewares/authMiddleware')
 
 //get all note
-router.get('/allnotes/:userid/', isStudent, getAllNote)
+router.get('/allnotes/:userId/', isStudent, getAllNote)
 
 //create a note
 router.post('/createnote', isStudent, createNote)

@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
+            required: true,
         },
         accountType: {
             type: String,
@@ -26,12 +27,15 @@ const userSchema = new mongoose.Schema(
         },
         phone: {
             type: String,
+            required: true,
         },
         firstName: {
             type: String,
+            required: true,
         },
         lastName: {
             type: String,
+            required: true,
         },
         dateOfBirth: {
             type: Date,
@@ -58,15 +62,21 @@ userSchema.pre('findOneAndUpdate', async function (next) {
 
 //login credentials verification
 userSchema.statics.login = async function (email, password) {
-    const user = await this.findOne({ email })
-    if (user) {
-        const auth = await bcrypt.compare(password, user.password)
-        if (auth) {
-            return user
-        }
-        throw Error('Password is invalid')
+    if (!email || !password) {
+        throw Error('All fields must be filled')
     }
-    throw Error('Email is invalid')
+
+    const user = await this.findOne({ email })
+    if (!user) {
+        throw Error('Incorrect email')
+    }
+
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) {
+        throw Error('Incorrect password')
+    }
+
+    return user
 }
 
 const User = mongoose.model('User', userSchema)

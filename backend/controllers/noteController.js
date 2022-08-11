@@ -1,6 +1,6 @@
 const Note = require('../models/noteModel')
 
-//handling returned errors from db
+//error handling
 const handleErrors = (err) => {
     let errors = { title: '', description: '' }
     if (err.message.includes('Note validation failed')) {
@@ -11,7 +11,7 @@ const handleErrors = (err) => {
     return errors
 }
 
-//note creation handling
+//create note
 const createNote = async (req, res) => {
     try {
         const { title, description, date, userid } = req.body
@@ -32,28 +32,8 @@ const createNote = async (req, res) => {
 //note feching handling
 const getAllNote = async (req, res) => {
     try {
-        const { uid } = req.params
-        // var newpage = page;
-        // const size = process.env.NOTES_PER_PAGE;
-        // const totalRows = await Note.countDocuments({ userid: uid });
-        // const totalPages = Math.ceil(totalRows / size)
-
-        // if (!totalPages) {
-        //     newpage = 1;
-        // }
-        // else if (page > totalPages) {
-        //     newpage = totalPages;
-        // }
-        // if (page < 1) {
-        //     newpage = 1;
-        // }
-        // const skip = (newpage - 1) * size;
-
-        const notes = await Note.find({ userid: uid })
-        // .select('-password')
-        // .sort({"_id":-1})
-        // .skip(skip)
-        // .limit(size);
+        const { userId } = req.params
+        const notes = await Note.find({ userid: userId })
         res.status(200).json({ notes: notes })
     } catch (error) {
         console.log(error)
@@ -62,17 +42,13 @@ const getAllNote = async (req, res) => {
     }
 }
 
-//note update handling
+//update note by id
 const updateNote = async (req, res) => {
     try {
-        const { nid } = req.params
-        const noteUpdated = await Note.findOneAndUpdate(
-            { _id: nid },
-            req.body,
-            {
-                upsert: true,
-            }
-        )
+        const { id } = req.params
+        const noteUpdated = await Note.findOneAndUpdate({ _id: id }, req.body, {
+            upsert: true,
+        })
         res.status(200).json({ success: true, noteUpdated })
     } catch (error) {
         console.log(error)
@@ -81,11 +57,11 @@ const updateNote = async (req, res) => {
     }
 }
 
-//note deletion handling
+//delete the note by id
 const deleteNote = async (req, res) => {
     try {
-        const { nid } = req.params
-        const noteDeleted = await Note.findOneAndDelete({ _id: nid })
+        const { id } = req.params
+        const noteDeleted = await Note.findOneAndDelete({ _id: id })
         res.status(200).json({ success: true, noteDeleted })
     } catch (error) {
         console.log(error)

@@ -1,8 +1,10 @@
 const UserModel = require('../Models/UserModel')
 const jwt = require('jsonwebtoken')
-const maxAge = process.env.JWT_AGE
+const crypto = require('crypto')
+const nodemailer = require('nodemailer')
+const maxAge = 3 * 24 * 60 * 60
 
-// JWT token creation function
+//jwt create token
 const createToken = (id, accountType, email, status) => {
     return jwt.sign(
         { id, accountType, email, status },
@@ -13,7 +15,7 @@ const createToken = (id, accountType, email, status) => {
     )
 }
 
-//handling returned errors from db
+//error handling
 const handleErrors = (err) => {
     let errors = { email: '', password: '' }
 
@@ -35,42 +37,16 @@ const handleErrors = (err) => {
     return errors
 }
 
-//generate random password for newly created user
-const passwordGen = () => {
-    const generator = require('generate-password')
-    const password = generator.generate({
-        length: 10,
-        numbers: true,
-        lowercase: true,
-    })
-    return password
-}
-
-//mail sender
-const sendmail = (email, password) => {
-    const nodemailer = require('nodemailer')
-    var transport = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    })
-    const mailOptions = {
-        from: '"Note Service" <note@surgeglobal.com>',
-        to: email,
-        subject: 'Note Service Login',
-        text: `Email: ${email} | password: ${password} | Login Link: http://localhost:3000/`,
-    }
-    transport.sendMail(mailOptions, function (err, info) {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(info)
-        }
-    })
-}
+let transport = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL,
+        pass: process.env.PASSWORD,
+    },
+    tls: {
+        rejectUnauthorized: false,
+    },
+})
 
 //user creation handling
 const createUser = async (req, res) => {
@@ -93,8 +69,32 @@ const createUser = async (req, res) => {
             email,
             password,
         })
+
+        //send veryfication mail  to the student
+
+        let mailOptions = {
+            from: '"Verify your Email" <adadfisk@gmail.com>',
+            to: user.email,
+            subject: 'Verify your login',
+            html: `<h2> Hello ${user.firstName}! </h2>
+            <h4>Please verify your account to continue... </h4>
+            <h4><B>Your temporary password : ${req.body.password}</B></h4>
+             <a href="http://localhost:3000">Verify Your Email</a>`,
+        }
+
+        //sending mail
+
+        transport.sendMail(mailOptions, function (err, info) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(
+                    'Verification mail sent to the student gmail account'
+                )
+            }
+        })
+
         res.status(201).json({ user: user._id, created: true })
-        //sendmail(email, password)
     } catch (error) {
         console.log(error)
         const errors = handleErrors(error)
@@ -102,7 +102,21 @@ const createUser = async (req, res) => {
     }
 }
 
-//user login handling
+//fetch all user
+const getAllUser = async (req, res) => {
+    try {
+        const users = await UserModel.find({ accountType: 'student' })
+        res.status(200).json({
+            users: users,
+        })
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors, created: false })
+    }
+}
+
+//login
 const login = async (req, res) => {
     try {
         const { email, password } = req.body
@@ -123,40 +137,6 @@ const login = async (req, res) => {
         console.log(error)
         const errors = handleErrors(error)
         res.json({ errors, login: false })
-    }
-}
-
-//user fetching handling
-const getAllUser = async (req, res) => {
-    try {
-        // const { page } = req.params
-        // var newpage = page
-        // const size = process.env.USERS_PER_PAGE
-        // const totalRows = await UserModel.countDocuments()
-        // const totalPages = Math.ceil(totalRows / size)
-
-        // if (!totalPages) {
-        //     newpage = 1
-        // } else if (page > totalPages) {
-        //     newpage = totalPages
-        // }
-        // if (page < 1) {
-        //     newpage = 1
-        // }
-        // const skip = (newpage - 1) * size
-
-        const users = await UserModel.find({ accountType: 'student' })
-        // .select('-password')
-        // .sort({ _id: -1 })
-        // .skip(skip)
-        // .limit(size)
-        res.status(200).json({
-            users: users,
-        })
-    } catch (error) {
-        console.log(error)
-        const errors = handleErrors(error)
-        res.json({ errors, created: false })
     }
 }
 
