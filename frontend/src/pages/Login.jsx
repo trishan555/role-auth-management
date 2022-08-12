@@ -44,7 +44,7 @@ export default function Login() {
 
             <Navbar bg='dark' variant='dark'>
                 <Container>
-                    <Navbar.Brand>Note App </Navbar.Brand>
+                    <Navbar.Brand>WasToWill</Navbar.Brand>
                     <Nav defaultActiveKey='/' className='me-auto'>
                         <Nav.Link href='/'>Login</Nav.Link>
                     </Nav>

@@ -56,7 +56,7 @@ export default function Register() {
             </div>
             <Navbar bg='dark' variant='dark'>
                 <Container>
-                    <Navbar.Brand>Note App | Admin Panel</Navbar.Brand>
+                    <Navbar.Brand>WasToWill</Navbar.Brand>
                     <Nav defaultActiveKey='/admin/create' className='me-auto'>
                         <Nav.Link href='/admin'>Home</Nav.Link>
                         <Nav.Link href='/admin/create'>Create User</Nav.Link>
