@@ -11,7 +11,7 @@ const {
     getOneUser,
 } = require('../controllers/userController')
 
-const { isUser, isAdmin } = require('../middlewares/authMiddleware')
+const { isUser, isAdmin, isStudent } = require('../middlewares/authMiddleware')
 
 //user login
 router.post('/login', login)
@@ -29,13 +29,13 @@ router.get('/get/:id', isUser, getOneUser)
 router.get('/usersearch/:item', isAdmin, userSearch)
 
 //user update
-router.post('/userupdate/:id', isUser, userUpdate)
+router.post('/userupdate/:id', isStudent, userUpdate)
 
 //verify email
 router.get('/verify-email/', verifyEmail)
 
 //delete student
-router.delete('/delete/:id', deleteUser)
+router.delete('/delete/:id', isAdmin, deleteUser)
 
 //user logout
 router.get('/logout', logout)
