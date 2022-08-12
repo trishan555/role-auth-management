@@ -3,17 +3,9 @@ import { useCookies } from 'react-cookie'
 import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import jwt_decode from 'jwt-decode'
-import {
-    Navbar,
-    Button,
-    Container,
-    Nav,
-    Form,
-    Card,
-    ButtonGroup,
-} from 'react-bootstrap'
-import UpdateNoteModel from './UpdateNoteModel'
-import DeleteNoteModel from './DeleteNoteModel'
+import { Navbar, Button, Container, Nav, Form, Card } from 'react-bootstrap'
+import UpdateNote from './UpdateNote'
+import DeleteNote from './DeleteNote'
 
 export default function CreateNote() {
     //cookie decode
@@ -26,8 +18,6 @@ export default function CreateNote() {
     })
 
     const [notes, setUsers] = useState([])
-    const [pages, setPages] = useState({})
-    var [page, setPage] = useState(1)
     const [show, setShow] = useState(false)
 
     //logout
@@ -48,7 +38,7 @@ export default function CreateNote() {
                 { ...values },
                 { withCredentials: true }
             )
-            console.log(data)
+            //console.log(data)
             if (data) {
                 if (data.errors) {
                     const { title, description } = data.errors
@@ -74,7 +64,6 @@ export default function CreateNote() {
                 { withCredentials: true }
             )
             setUsers(result.data.notes)
-            setPages(result.data.pages)
         } catch (error) {
             if (
                 error.message.includes('401') ||
@@ -86,12 +75,6 @@ export default function CreateNote() {
         }
     }
 
-    // const nextPage = () => {
-    //     if (pages.totalPages > page) setPage(++page)
-    // }
-    // const previousPage = () => {
-    //     if (1 < page) setPage(--page)
-    // }
     const updatePage = (show) => {
         setShow(show)
     }
@@ -112,7 +95,7 @@ export default function CreateNote() {
             <div>
                 <Navbar bg='dark' variant='dark'>
                     <Container>
-                        <Navbar.Brand>Note App | Notes</Navbar.Brand>
+                        <Navbar.Brand>WasToWill</Navbar.Brand>
                         <Nav
                             defaultActiveKey='/notes/create'
                             className='me-auto'
@@ -120,6 +103,7 @@ export default function CreateNote() {
                             <Nav.Link href='/notes/create'>
                                 Create note
                             </Nav.Link>
+                            <Nav.Link href='/notes/profile'>Profile</Nav.Link>
                             <Nav.Link onClick={logOut}>
                                 Log Out ({decoded.email})
                             </Nav.Link>
@@ -141,7 +125,7 @@ export default function CreateNote() {
                                 }
                                 name='title'
                                 type='text'
-                                placeholder='title'
+                                placeholder='Title'
                             />
                             <Form.Text className='text-muted'> </Form.Text>
 
@@ -155,7 +139,7 @@ export default function CreateNote() {
                                 }
                                 name='description'
                                 type='text'
-                                placeholder='Description '
+                                placeholder='Content '
                             />
                             <Form.Text className='text-muted'> </Form.Text>
                         </Form.Group>
@@ -177,13 +161,13 @@ export default function CreateNote() {
                                     </Card.Subtitle>
                                     <Card.Text>{detail.description}</Card.Text>
 
-                                    <UpdateNoteModel
+                                    <UpdateNote
                                         noteid={detail._id}
                                         title={detail.title}
                                         description={detail.description}
                                         updatePage={updatePage}
                                     />
-                                    <DeleteNoteModel
+                                    <DeleteNote
                                         noteid={detail._id}
                                         title={detail.title}
                                         updatePage={updatePage}

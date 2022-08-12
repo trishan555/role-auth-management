@@ -35,7 +35,7 @@ export default function Register() {
                     const { email } = data.errors
                     if (email) generateError(email)
                 } else {
-                    toast.success('User created successfully')
+                    toast.success('Verification email send to the user !')
                     setTimeout(() => {
                         navigate('/admin')
                     }, 2000)

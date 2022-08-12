@@ -12,7 +12,7 @@ import {
     Row,
     Col,
 } from 'react-bootstrap'
-import ViewUserModel from './ViewUserModel'
+import ViewUser from '../Student/ViewUser'
 import jwt_decode from 'jwt-decode'
 import { CgTrash } from 'react-icons/cg'
 
@@ -29,8 +29,6 @@ export default function AdminHome() {
     }
 
     const [users, setUsers] = useState([])
-    // const [pages, setPages] = useState({})
-    // var [page, setPage] = useState(1)
 
     //fetch all users(students)
     const fetchUsers = async () => {
@@ -91,7 +89,6 @@ export default function AdminHome() {
         fetchUsers()
     }, [])
 
-    //ISO to dd/mm/yyyy
     function dateConvert(date) {
         return new Date(date).toLocaleDateString()
     }
@@ -167,7 +164,7 @@ export default function AdminHome() {
                                     </td>
                                     <td className='text-center'>
                                         <div className='container mt-3 mr-2'>
-                                            <ViewUserModel
+                                            <ViewUser
                                                 uid={user._id}
                                                 firstName={user.firstName}
                                                 lastName={user.lastName}

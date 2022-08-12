@@ -2,7 +2,7 @@ import { toast } from 'react-hot-toast'
 import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form } from 'react-bootstrap'
 import axios from 'axios'
-function DeleteNoteModel({ noteid, title, updatePage }) {
+function DeleteNote({ noteid, title, updatePage }) {
     const [show, setShow] = useState(false)
 
     const handleClose = () => setShow(false)
@@ -57,4 +57,4 @@ function DeleteNoteModel({ noteid, title, updatePage }) {
         </>
     )
 }
-export default DeleteNoteModel
+export default DeleteNote

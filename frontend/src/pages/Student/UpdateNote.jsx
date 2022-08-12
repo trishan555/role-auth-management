@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form } from 'react-bootstrap'
 import axios from 'axios'
 
-function UpdateNoteModel({ noteid, title, description, updatePage }) {
+function UpdateNote({ noteid, title, description, updatePage }) {
     const [show, setShow] = useState(false)
     const [values, setValues] = useState({
         title: title,
@@ -103,4 +103,4 @@ function UpdateNoteModel({ noteid, title, description, updatePage }) {
         </>
     )
 }
-export default UpdateNoteModel
+export default UpdateNote
