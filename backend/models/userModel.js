@@ -79,6 +79,10 @@ userSchema.statics.login = async function (email, password) {
         throw Error('Incorrect password')
     }
 
+    if (!user.status) {
+        throw Error('Not activated')
+    }
+
     return user
 }
 

@@ -30,6 +30,11 @@ const handleErrors = (err) => {
     ) {
         errors.email = 'Please enter valid credentials !'
     }
+
+    if (err.message === 'Not activated') {
+        errors.email = 'Please activate your account first !'
+    }
+
     if (err.code === 11000) {
         errors.email = 'Email is already registered!'
         return errors
@@ -144,6 +149,36 @@ const getAllUser = async (req, res) => {
     }
 }
 
+const getOneUser = async (req, res) => {
+    let userId = req.params.id
+    await UserModel.findById(userId)
+        .then((user) => {
+            res.status(200).json({ user })
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).json({
+                status: 'Error with find user',
+                error: err.message,
+            })
+        })
+}
+
+const deleteUser = async (req, res) => {
+    let userId = req.params.id
+    await UserModel.findByIdAndDelete(userId)
+        .then(() => {
+            res.status(200).json({ status: 'User deleted' })
+        })
+        .catch((err) => {
+            console.log(err)
+            res.status(500).json({
+                status: 'Error with delete user',
+                error: err.message,
+            })
+        })
+}
+
 const verifyEmail = async (req, res) => {
     try {
         const token = req.query.token
@@ -233,6 +268,8 @@ module.exports = {
     logout,
     userUpdate,
     userSearch,
+    getOneUser,
+    deleteUser,
     getAllUser,
     login,
     createUser,
