@@ -96,11 +96,18 @@ const createUser = async (req, res) => {
         var mailOptions = {
             from: '"Verify your Email" <adadfisk@gmail.com>',
             to: user.email,
-            subject: 'Verify your login',
-            html: `<h2> Hello ${user.firstName}! </h2>
-            <h4>Please verify your account to continue... </h4>
-            <h4><B>Your temporary password : ${req.body.password}</B></h4>
-             <a href="http://${req.headers.host}/user/verify-email?token=${user.emailToken}">Verify Your Email</a>`,
+            subject: 'Verify your login to access WasToWill',
+            html: `
+             <div style="max-width: 700px; margin:auto; border: 8px solid #ddd; padding: 50px 20px; font-size: 110%;">
+          
+             <h2 style="text-align: center; color: teal;"> Hello ${user.firstName} ! </h2>
+             <h3>Please verify your account to continue to<span> <b>WasToWill </b></span> </h3>
+             <p><b>Your Temporary Password : ${req.body.password}</b></p>
+             <p>Using Temporary password update your profile with New Password</p>
+              <a href="http://${req.headers.host}/user/verify-email?token=${user.emailToken}" style="background: crimson; text-decoration: none; color: white; padding: 10px 20px; margin: 10px 0; display: inline-block;">Verify Your Email</a>
+           
+            </div>
+             `,
         }
 
         //sending mail
