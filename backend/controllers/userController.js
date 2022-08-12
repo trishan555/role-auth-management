@@ -1,6 +1,7 @@
 const UserModel = require('../Models/UserModel')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const maxAge = 3 * 24 * 60 * 60
 
@@ -18,15 +19,19 @@ const createToken = (id, accountType, email, status) => {
 //error handling
 const handleErrors = (err) => {
     let errors = { email: '', password: '' }
+    if (err.message === 'All fields must be filled') {
+        errors.email = 'All fields must be filled'
+        errors.password = 'All fields must be filled'
+    }
 
     if (
-        err.message === 'Password is invalid' ||
-        err.message === 'Email is invalid'
+        err.message === 'Incorrect email' ||
+        err.message === 'Incorrect password'
     ) {
-        errors.email = 'Email/Password is invalid'
+        errors.email = 'Please enter valid credentials !'
     }
     if (err.code === 11000) {
-        errors.email = 'Email is already exist!'
+        errors.email = 'Email is already registered!'
         return errors
     }
     if (err.message.includes('User validation failed')) {
@@ -37,7 +42,7 @@ const handleErrors = (err) => {
     return errors
 }
 
-let transport = nodemailer.createTransport({
+var transport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.GMAIL,
@@ -60,7 +65,17 @@ const createUser = async (req, res) => {
             email,
             password,
         } = req.body
-        const user = await UserModel.create({
+        // const user = await UserModel.create({
+        //     firstName,
+        //     lastName,
+        //     dateOfBirth,
+        //     phone,
+        //     accountType,
+        //     email,
+        //     password,
+        //     emailToken: crypto.randomBytes(64).toString('hex'),
+        // })
+        const user = new UserModel({
             firstName,
             lastName,
             dateOfBirth,
@@ -68,18 +83,24 @@ const createUser = async (req, res) => {
             accountType,
             email,
             password,
+            emailToken: crypto.randomBytes(64).toString('hex'),
         })
+
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(user.password, salt)
+        user.password = hashedPassword
+        await user.save()
 
         //send veryfication mail  to the student
 
-        let mailOptions = {
+        var mailOptions = {
             from: '"Verify your Email" <adadfisk@gmail.com>',
             to: user.email,
             subject: 'Verify your login',
             html: `<h2> Hello ${user.firstName}! </h2>
             <h4>Please verify your account to continue... </h4>
             <h4><B>Your temporary password : ${req.body.password}</B></h4>
-             <a href="http://localhost:3000">Verify Your Email</a>`,
+             <a href="http://${req.headers.host}/user/verify-email?token=${user.emailToken}">Verify Your Email</a>`,
         }
 
         //sending mail
@@ -113,6 +134,25 @@ const getAllUser = async (req, res) => {
         console.log(error)
         const errors = handleErrors(error)
         res.json({ errors, created: false })
+    }
+}
+
+const verifyEmail = async (req, res) => {
+    try {
+        const token = req.query.token
+        const user = await UserModel.findOne({ emailToken: token })
+        if (user) {
+            ;(user.emailToken = null), (user.status = true)
+            await user.save()
+
+            res.status(200).redirect(process.env.FRONTEND_URL)
+        } else {
+            console.log('email is not verified')
+        }
+    } catch (error) {
+        console.log(error)
+        const errors = handleErrors(error)
+        res.json({ errors })
     }
 }
 
@@ -162,13 +202,16 @@ const userUpdate = async (req, res) => {
         const { id } = req.params
         const userUpdated = await UserModel.findOneAndUpdate(
             { _id: id },
+
             req.body,
             {
                 upsert: true,
+                new: true,
             }
         )
+        await bcrypt.genSalt()
         res.status(200).json({ success: true, userUpdated })
-    } catch {
+    } catch (error) {
         console.log(error)
     }
 }
@@ -186,4 +229,5 @@ module.exports = {
     getAllUser,
     login,
     createUser,
+    verifyEmail,
 }

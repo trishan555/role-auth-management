@@ -6,6 +6,7 @@ const {
     userUpdate,
     logout,
     userSearch,
+    verifyEmail,
 } = require('../controllers/userController')
 
 const { isUser, isAdmin } = require('../middlewares/authMiddleware')
@@ -24,6 +25,8 @@ router.get('/usersearch/:item', isAdmin, userSearch)
 
 //user update
 router.post('/userupdate/:id', isUser, userUpdate)
+
+router.get('/verify-email/', verifyEmail)
 
 //user logout
 router.get('/logout', logout)

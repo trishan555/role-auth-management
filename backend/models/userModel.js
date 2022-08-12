@@ -41,17 +41,20 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: Date.now(),
         },
+        emailToken: {
+            type: String,
+        },
     },
     {
         timestamps: true,
     }
 )
 //encrypt password before save
-userSchema.pre('save', async function (next) {
-    const salt = await bcrypt.genSalt()
-    this.password = await bcrypt.hash(this.password, salt)
-    next()
-})
+// userSchema.pre('save', async function (next) {
+//     const salt = await bcrypt.genSalt()
+//     this.password = await bcrypt.hash(this.password, salt)
+//     next()
+// })
 
 //encrypt password before update(registraion)
 userSchema.pre('findOneAndUpdate', async function (next) {
