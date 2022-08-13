@@ -37,11 +37,6 @@ export default function UpdateUser() {
     const [phone, setPhone] = useState(student.phone)
     const [dateOfBirth, setDateOfBirth] = useState(student.dateOfBirth)
 
-    const logOut = () => {
-        window.location.replace('http://localhost:8000/user/logout')
-        return false
-    }
-
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {

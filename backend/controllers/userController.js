@@ -84,16 +84,7 @@ const createUser = async (req, res) => {
             email,
             password,
         } = req.body
-        // const user = await UserModel.create({
-        //     firstName,
-        //     lastName,
-        //     dateOfBirth,
-        //     phone,
-        //     accountType,
-        //     email,
-        //     password,
-        //     emailToken: crypto.randomBytes(64).toString('hex'),
-        // })
+
         const user = new UserModel({
             firstName,
             lastName,
@@ -121,17 +112,12 @@ const createUser = async (req, res) => {
             throw Error('Invalid phone number')
         }
 
-        // if (user.phone) {
-        //     throw Error('All fields must be filled')
-        // }
-
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(user.password, salt)
         user.password = hashedPassword
         await user.save()
 
         //send veryfication mail  to the student
-
         var mailOptions = {
             from: '"Verify your Email" <adadfisk@gmail.com>',
             to: user.email,
@@ -150,7 +136,6 @@ const createUser = async (req, res) => {
         }
 
         //sending mail
-
         transport.sendMail(mailOptions, function (err, info) {
             if (err) {
                 console.log(err)
@@ -256,7 +241,7 @@ const login = async (req, res) => {
     }
 }
 
-//user search handling
+//user search
 const userSearch = async (req, res) => {
     try {
         const { item } = req.params
