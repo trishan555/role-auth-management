@@ -1,23 +1,13 @@
 import React, { useState } from 'react'
-import { useCookies } from 'react-cookie'
 import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
-import { Navbar, Button, Container, Nav, Form } from 'react-bootstrap'
+import NavAdmin from '../components/NavAdmin'
+import { Button, Form } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import jwt_decode from 'jwt-decode'
 
 export default function Register() {
     const navigate = useNavigate()
     const [values, setValues] = useState({})
-    const [cookie] = useCookies([])
-
-    const token = cookie.jwt
-    const decoded = jwt_decode(token)
-
-    const logOut = () => {
-        window.location.replace('http://localhost:8000/user/logout')
-        return false
-    }
 
     const generateError = (err) => toast.error(err)
 
@@ -32,8 +22,9 @@ export default function Register() {
             console.log(data)
             if (data) {
                 if (data.errors) {
-                    const { email } = data.errors
-                    if (email) generateError(email)
+                    const { email, password, phone } = data.errors
+                    if (email || password || phone)
+                        generateError(email || password || phone)
                 } else {
                     toast.success('Verification email send to the user !')
                     setTimeout(() => {
@@ -54,22 +45,11 @@ export default function Register() {
             <div>
                 <Toaster position='top-center' reverseOrder={false} />
             </div>
-            <Navbar bg='dark' variant='dark'>
-                <Container>
-                    <Navbar.Brand>WasToWill</Navbar.Brand>
-                    <Nav defaultActiveKey='/admin/create' className='me-auto'>
-                        <Nav.Link href='/admin'>Home</Nav.Link>
-                        <Nav.Link href='/admin/create'>Create User</Nav.Link>
-                        <Nav.Link onClick={logOut}>
-                            Log Out ({decoded.email})
-                        </Nav.Link>
-                    </Nav>
-                </Container>
-            </Navbar>
+            <NavAdmin />
 
-            <div className='p-5 d-flex justify-content-center'>
+            <div className='py-4 d-flex justify-content-center'>
                 <Form onSubmit={(e) => handleSubmit(e)}>
-                    <h2 className='m-1'>Create User</h2>
+                    <h3 className='mb-4'>Create User</h3>
                     <Form.Group className='mb-3' controlId='formBasicEmail'>
                         <Form.Label>First Name</Form.Label>
                         <Form.Control
@@ -163,7 +143,7 @@ export default function Register() {
                     />
                     <Form.Text className='text-muted'> </Form.Text>
 
-                    <Button variant='primary' type='submit'>
+                    <Button className='mt-3' variant='primary' type='submit'>
                         Submit
                     </Button>
                 </Form>

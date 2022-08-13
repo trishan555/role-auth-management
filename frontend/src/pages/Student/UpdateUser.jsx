@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import axios from 'axios'
-import { Navbar, Button, Container, Nav, Form } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { Toaster } from 'react-hot-toast'
 import jwt_decode from 'jwt-decode'
+import NavStudent from '../../components/NavStudent'
 
 export default function UpdateUser() {
     const [student, setStudent] = useState({})
@@ -65,20 +66,10 @@ export default function UpdateUser() {
             <div>
                 <Toaster position='top-center' reverseOrder={false} />
             </div>
-            <Navbar bg='dark' variant='dark'>
-                <Container>
-                    <Navbar.Brand>WasToWill</Navbar.Brand>
-                    <Nav defaultActiveKey='notes/profile' className='me-auto'>
-                        <Nav.Link href='/notes/create'>Create note</Nav.Link>
-                        <Nav.Link onClick={logOut}>
-                            Log Out ({decoded.email})
-                        </Nav.Link>
-                    </Nav>
-                </Container>
-            </Navbar>
+            <NavStudent />
             <div className='p-5 d-flex justify-content-center'>
                 <Form onSubmit={(e) => handleSubmit(e)}>
-                    <h2 className='m-1'>Profile</h2>
+                    <h3 className='m-1'>Profile</h3>
                     <Form.Group className='mb-3' controlId='formBasicEmail'>
                         <br></br>
                         <Form.Label>First Name</Form.Label>

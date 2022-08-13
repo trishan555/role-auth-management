@@ -1,36 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { useCookies } from 'react-cookie'
 import { Toaster, toast } from 'react-hot-toast'
 import axios from 'axios'
-import {
-    Navbar,
-    Table,
-    Button,
-    Container,
-    Nav,
-    Form,
-    Row,
-    Col,
-} from 'react-bootstrap'
+import { Table, Form, Row, Col } from 'react-bootstrap'
 import ViewUser from '../Student/ViewUser'
-import jwt_decode from 'jwt-decode'
 import { CgTrash } from 'react-icons/cg'
 
+import NavAdmin from '../../components/NavAdmin'
+
 export default function AdminHome() {
-    //cookie decode
-    const [cookie] = useCookies([])
-    const token = cookie.jwt
-    const decoded = jwt_decode(token)
-
-    //logout
-    const logOut = () => {
-        window.location.replace('http://localhost:8000/user/logout')
-        return false
-    }
-
     const [users, setUsers] = useState([])
 
-    //fetch all users(students)
+    //fetch all users
     const fetchUsers = async () => {
         try {
             const result = await axios.get(
@@ -99,49 +79,34 @@ export default function AdminHome() {
                 <Toaster position='top-center' reverseOrder={false} />
             </div>
             <div>
-                <Navbar bg='dark' variant='dark'>
-                    <Container>
-                        <Navbar.Brand>WasToWill</Navbar.Brand>
-                        <Nav defaultActiveKey='/admin' className='me-auto'>
-                            <Nav.Link href='/admin'>Home</Nav.Link>
-                            <Nav.Link href='/admin/create'>
-                                Create User
-                            </Nav.Link>
-                            <Nav.Link onClick={logOut}>
-                                Log Out ({decoded.email})
-                            </Nav.Link>
-                        </Nav>
-                    </Container>
-                </Navbar>
+                <NavAdmin />
 
                 <div className='d-flex  justify-content-center'>
-                    <h2 className='m-3'>All Users</h2>
+                    <h3 className='m-5'>Admin Dashboard</h3>
                 </div>
-
+                <div className='d-flex justify-content-end mb-4'>
+                    <Form>
+                        <Row className=''>
+                            <Col s={10}>
+                                <Form.Control
+                                    onChange={(e) => handleSearch(e)}
+                                    name='item'
+                                    placeholder='Search by email'
+                                />
+                            </Col>
+                        </Row>
+                    </Form>
+                </div>
                 <div className='d-flex flex-wrap justify-content-center'>
                     <Table striped bordered hover style={{ width: '75vw' }}>
                         <thead>
                             <tr>
-                                <th className='text-center'>First Name</th>
-                                <th className='text-center'>Last Name</th>
+                                <th className='text-center'>First name</th>
+                                <th className='text-center'>Last name</th>
                                 <th className='text-center'>Email</th>
                                 <th className='text-center'>Phone Number</th>
-                                <th className='text-center'>Birth Day</th>
-                                <th className='text-center'>
-                                    <Form>
-                                        <Row>
-                                            <Col xs={10}>
-                                                <Form.Control
-                                                    onChange={(e) =>
-                                                        handleSearch(e)
-                                                    }
-                                                    name='item'
-                                                    placeholder='Search by email'
-                                                />
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </th>
+                                <th className='text-center'>Birthday</th>
+                                <th className='text-center'>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -163,26 +128,31 @@ export default function AdminHome() {
                                         {dateConvert(user.dateOfBirth)}
                                     </td>
                                     <td className='text-center'>
-                                        <div className='container mt-3 mr-2'>
+                                        <div className='container'>
                                             <ViewUser
+                                                style={{
+                                                    fontSize: '1rem',
+                                                }}
                                                 uid={user._id}
+                                                email={user.email}
                                                 firstName={user.firstName}
                                                 lastName={user.lastName}
-                                                email={user.email}
                                                 phone={user.phone}
                                                 dob={user.dateOfBirth}
                                                 status={user.status}
                                                 accountType={user.accountType}
                                             />
 
-                                            <Button
-                                                variant='primary'
+                                            <CgTrash
+                                                style={{
+                                                    marginLeft: '3rem',
+                                                    fontSize: '1.2rem',
+                                                }}
+                                                type='button'
                                                 onClick={() =>
                                                     deleteUser(user._id)
                                                 }
-                                            >
-                                                <CgTrash />
-                                            </Button>
+                                            />
                                         </div>
                                     </td>
                                 </tr>

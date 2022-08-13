@@ -3,9 +3,10 @@ import { useCookies } from 'react-cookie'
 import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import jwt_decode from 'jwt-decode'
-import { Navbar, Button, Container, Nav, Form, Card } from 'react-bootstrap'
+import { Button, Form, Card } from 'react-bootstrap'
 import UpdateNote from './UpdateNote'
 import DeleteNote from './DeleteNote'
+import NavStudent from '../../components/NavStudent'
 
 export default function CreateNote() {
     //cookie decode
@@ -19,12 +20,6 @@ export default function CreateNote() {
 
     const [notes, setUsers] = useState([])
     const [show, setShow] = useState(false)
-
-    //logout
-    const logOut = () => {
-        window.location.replace('http://localhost:8000/user/logout')
-        return false
-    }
 
     //generate toast per error
     const generateError = (err) => toast.error(err)
@@ -93,28 +88,12 @@ export default function CreateNote() {
                 <Toaster position='top-center' reverseOrder={false} />
             </div>
             <div>
-                <Navbar bg='dark' variant='dark'>
-                    <Container>
-                        <Navbar.Brand>WasToWill</Navbar.Brand>
-                        <Nav
-                            defaultActiveKey='/notes/create'
-                            className='me-auto'
-                        >
-                            <Nav.Link href='/notes/create'>
-                                Create note
-                            </Nav.Link>
-                            <Nav.Link href='/notes/profile'>Profile</Nav.Link>
-                            <Nav.Link onClick={logOut}>
-                                Log Out ({decoded.email})
-                            </Nav.Link>
-                        </Nav>
-                    </Container>
-                </Navbar>
+                <NavStudent />
 
                 <div className='p-5 d-flex justify-content-center'>
                     <Form onSubmit={(e) => handleSubmit(e)}>
-                        <h2 className='m-1'>Create Note</h2>
-                        <Form.Group className='mb-3' controlId='formBasicEmail'>
+                        <h3 className='m-2'>Create Note</h3>
+                        <Form.Group className='mb-4' controlId='formBasicEmail'>
                             <Form.Label>Title</Form.Label>
                             <Form.Control
                                 onChange={(e) =>
@@ -129,7 +108,9 @@ export default function CreateNote() {
                             />
                             <Form.Text className='text-muted'> </Form.Text>
 
-                            <Form.Label>Description</Form.Label>
+                            <Form.Label className='mt-3'>
+                                Description
+                            </Form.Label>
                             <Form.Control
                                 onChange={(e) =>
                                     setValues({
@@ -151,27 +132,28 @@ export default function CreateNote() {
                 </div>
 
                 <div className='d-flex flex-wrap justify-content-center'>
-                    {notes.map((detail) => (
-                        <div className='m-2' key={detail._id}>
+                    {notes.map((note) => (
+                        <div className='m-2' key={note._id}>
                             <Card style={{ width: '18rem' }}>
                                 <Card.Body>
-                                    <Card.Title>{detail.title}</Card.Title>
+                                    <Card.Title>{note.title}</Card.Title>
                                     <Card.Subtitle className='mb-2 text-muted'>
-                                        {dateConvert(detail.createdAt)}
+                                        {dateConvert(note.createdAt)}
                                     </Card.Subtitle>
-                                    <Card.Text>{detail.description}</Card.Text>
-
-                                    <UpdateNote
-                                        noteid={detail._id}
-                                        title={detail.title}
-                                        description={detail.description}
-                                        updatePage={updatePage}
-                                    />
-                                    <DeleteNote
-                                        noteid={detail._id}
-                                        title={detail.title}
-                                        updatePage={updatePage}
-                                    />
+                                    <Card.Text>{note.description}</Card.Text>
+                                    <div className='d-grid gap-2'>
+                                        <UpdateNote
+                                            noteid={note._id}
+                                            title={note.title}
+                                            description={note.description}
+                                            updatePage={updatePage}
+                                        />
+                                        <DeleteNote
+                                            noteid={note._id}
+                                            title={note.title}
+                                            updatePage={updatePage}
+                                        />
+                                    </div>
                                 </Card.Body>
                             </Card>
                         </div>

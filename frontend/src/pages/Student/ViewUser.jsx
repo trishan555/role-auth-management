@@ -1,6 +1,6 @@
 import { Modal, Button } from 'react-bootstrap'
 import React, { useState } from 'react'
-import { BiMessageSquareDetail } from 'react-icons/bi'
+import { CgDetailsMore } from 'react-icons/cg'
 
 function ViewUser({
     uid,
@@ -23,9 +23,7 @@ function ViewUser({
 
     return (
         <>
-            <Button variant='primary' onClick={handleShow}>
-                <BiMessageSquareDetail />
-            </Button>
+            <CgDetailsMore onClick={handleShow} type='button' />
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>User Details</Modal.Title>

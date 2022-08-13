@@ -14,19 +14,19 @@ export default function App() {
         <BrowserRouter>
             <Routes>
                 <Route element={<AdminRoute />}>
-                    <Route element={<Register />} path='/admin/create' exact />
-                    <Route element={<AdminHome />} path='/admin' exact />
+                    <Route path='/admin/create' exact element={<Register />} />
+                    <Route path='/admin' exact element={<AdminHome />} />
                 </Route>
                 <Route element={<StudentRoute />}>
                     <Route
-                        element={<CreateNote />}
                         path='/notes/create'
                         exact
+                        element={<CreateNote />}
                     />
                     <Route
-                        element={<UpdateUser />}
                         path='/notes/profile'
                         exact
+                        element={<UpdateUser />}
                     />
                 </Route>
 
