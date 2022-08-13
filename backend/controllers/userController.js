@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const validator = require('validator')
 const maxAge = 3 * 24 * 60 * 60
 
 //jwt create token
@@ -18,7 +19,13 @@ const createToken = (id, accountType, email, status) => {
 
 //error handling
 const handleErrors = (err) => {
-    let errors = { email: '', password: '' }
+    let errors = {
+        email: '',
+        password: '',
+        phone: '',
+        firstName: '',
+        lastName: '',
+    }
     if (err.message === 'All fields must be filled') {
         errors.email = 'All fields must be filled'
         errors.password = 'All fields must be filled'
@@ -29,6 +36,13 @@ const handleErrors = (err) => {
         err.message === 'Incorrect password'
     ) {
         errors.email = 'Please enter valid credentials !'
+    }
+    if (err.message === 'Password not strong enough') {
+        errors.password =
+            'minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1'
+    }
+    if (err.message === 'Invalid phone number') {
+        errors.phone = 'Please provide valid phone number'
     }
 
     if (err.message === 'Not activated') {
@@ -90,6 +104,26 @@ const createUser = async (req, res) => {
             password,
             emailToken: crypto.randomBytes(64).toString('hex'),
         })
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !password ||
+            !phone ||
+            !dateOfBirth
+        ) {
+            throw Error('All fields must be filled')
+        }
+        if (!validator.isStrongPassword(req.body.password)) {
+            throw Error('Password not strong enough')
+        }
+        if (!validator.isMobilePhone(req.body.phone)) {
+            throw Error('Invalid phone number')
+        }
+
+        // if (user.phone) {
+        //     throw Error('All fields must be filled')
+        // }
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(user.password, salt)
@@ -127,11 +161,11 @@ const createUser = async (req, res) => {
             }
         })
 
-        res.status(201).json({ user: user._id, created: true })
+        res.status(201).json({ user: user._id })
     } catch (error) {
         console.log(error)
         const errors = handleErrors(error)
-        res.json({ errors, created: false })
+        res.json({ errors })
     }
 }
 
@@ -145,7 +179,7 @@ const getAllUser = async (req, res) => {
     } catch (error) {
         console.log(error)
         const errors = handleErrors(error)
-        res.json({ errors, created: false })
+        res.json({ errors })
     }
 }
 
@@ -214,11 +248,11 @@ const login = async (req, res) => {
             httpOnly: false,
             maxAge: maxAge * 1000,
         })
-        res.status(200).json({ user: user._id, login: true })
+        res.status(200).json({ user: user._id })
     } catch (error) {
         console.log(error)
         const errors = handleErrors(error)
-        res.json({ errors, login: false })
+        res.json({ errors })
     }
 }
 
@@ -234,7 +268,7 @@ const userSearch = async (req, res) => {
     } catch (error) {
         console.log(error)
         const errors = handleErrors(error)
-        res.json({ errors, created: false })
+        res.json({ errors })
     }
 }
 
@@ -252,7 +286,7 @@ const userUpdate = async (req, res) => {
             }
         )
         await bcrypt.genSalt()
-        res.status(200).json({ success: true, userUpdated })
+        res.status(200).json({ userUpdated })
     } catch (error) {
         console.log(error)
     }

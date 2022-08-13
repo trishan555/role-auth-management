@@ -35,7 +35,7 @@ router.post('/userupdate/:id', isStudent, userUpdate)
 router.get('/verify-email/', verifyEmail)
 
 //delete student
-router.delete('/delete/:id', isAdmin, deleteUser)
+router.delete('/delete/:id', deleteUser)
 
 //user logout
 router.get('/logout', logout)
