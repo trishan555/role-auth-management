@@ -3,6 +3,8 @@ import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import { Navbar, Button, Container, Nav, Form } from 'react-bootstrap'
+import { FaForumbee } from 'react-icons/fa'
+
 export default function Login() {
     const navigate = useNavigate()
 
@@ -42,24 +44,28 @@ export default function Login() {
                 <Toaster position='top-center' reverseOrder={false} />
             </div>
 
-            <Navbar bg='dark' variant='dark'>
+            <Navbar bg='white' variant='white'>
                 <Container>
-                    <Navbar.Brand>WasToWill</Navbar.Brand>
-                    <Nav defaultActiveKey='/' className='me-auto'>
+                    <Navbar.Brand>
+                        <FaForumbee />
+                        <h2>WasToWill</h2>
+                    </Navbar.Brand>
+                    <Nav defaultActiveKey='/' className='justify-content-end'>
                         <Nav.Link href='/'>Login</Nav.Link>
                     </Nav>
                 </Container>
             </Navbar>
+
             <div>
                 <div className='p-5 d-flex justify-content-center'>
                     <Form
                         onSubmit={(e) => handleSubmit(e)}
                         style={{ width: '18rem' }}
                     >
-                        <h2>Login</h2>
+                        <h3>Login</h3>
                         <Form.Group controlId='formBasicEmail'>
                             <br></br>
-                            <Form.Label>Email</Form.Label>
+                            <Form.Label>Email Address</Form.Label>
                             <Form.Control
                                 onChange={(e) =>
                                     setValues({
@@ -69,11 +75,11 @@ export default function Login() {
                                 }
                                 name='email'
                                 type='email'
-                                placeholder='email'
+                                placeholder='Enter email'
                             />
                             <Form.Text className='text-muted'> </Form.Text>
 
-                            <Form.Label>Password</Form.Label>
+                            <Form.Label className='mt-3'>Password</Form.Label>
                             <Form.Control
                                 onChange={(e) =>
                                     setValues({
@@ -83,7 +89,7 @@ export default function Login() {
                                 }
                                 name='password'
                                 type='password'
-                                placeholder='password'
+                                placeholder='Enter password'
                             />
                             <Form.Text className='text-muted'> </Form.Text>
                         </Form.Group>
