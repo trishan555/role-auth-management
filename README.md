@@ -10,10 +10,6 @@ Used Technology stack: NodeJS, ExpressJS , ReactJS, MongoDB
 
 User roles : There are two roles available as Admin and User(Student)
 
-Fuctionality :
-
-Important : When you create a student , make sure to use a valid email address as student email. Because the email address will receive a Temporary password and Verifying Link.
-
 Initial page will be login page and first have to log in to the system as an Admin.
 Seeder file in backend root folder. It includes admin and dummy verified student as well.
 Admin can create users, view user details and search users by name, email or id and delete specific users.
@@ -27,36 +23,6 @@ Then the user can use a temporary password to login to the system. (Without veri
 Students can update their profiles, add notes, view notes, update notes and delete notes.
 
 This app is implemented by using JWT token based authentication and token save in frontend using cookie.
-
-
-All routes are protected.
-***
-
-## Run application
-
-1.	Clone the Repository.
-2.	Go to backend folder ``` cd backend ```
-3.	Run ``` npm install ```
-4.	Run ``` node seeder.js ```
-3.	Run ``` npm start ``` Server will be run on port:8000
-
-While running server,
-
-1.  Go to frontend folder ``` cd frontend ```
-2.	Run ``` npm install ```
-3.	Run ``` npm start ``` App will be open on port:3000 with login screen
-
-Using following credencials login to the system and create the users.
-
-Email- admin@gmail.com
-Password - admin123
-
-
-In case I added verified student as well in seeder.js file.
-
-Verified student Email - student@gmail.com
-Password - student123 
-
 
 
 ## Thank You!
